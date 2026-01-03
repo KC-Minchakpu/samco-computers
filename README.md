@@ -10,3 +10,8 @@
    b. Create GitHub account if you don't have one
    c. connect VS Code to github
    d. publish the repository
+5. List Products
+   a. Create Product Type
+   b. Create Products array
+   c. Add Product images
+   d. Render Products
