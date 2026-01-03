@@ -22,7 +22,7 @@ export const sampleProducts: Product[] = [
     brand: 'Dell',
     price: 1_895_250,
     description:
-      'A 15-inch laptop with a built-in HD camera, enlarged ergonomic keyboard and AMD Ryzen™ processors.',
+      'The Dell Inspiron 15 is a versatile, mid-range laptop designed for students, home office workers, and everyday users who need a balance of performance and value. It is widely recognized for its practical design and reliable build quality.',
     rating: 4.2,
     numReviews: 80,
     countInStock: 15,
