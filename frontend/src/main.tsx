@@ -11,6 +11,10 @@ import './index.css'
 import App from './App.tsx'
 import HomePage from './pages/HomePage.tsx'
 import ProductPage from './pages/ProductPage'
+import axios from 'axios'
+
+axios.defaults.baseURL =
+  import.meta.env.MODE === 'development' ? 'http://localhost:5000' : '/'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
