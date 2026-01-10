@@ -1,9 +1,10 @@
+import axios from 'axios'
 import { useEffect, useReducer } from 'react'
 import { Col, Row, Spinner, Alert } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import axios from 'axios'
-import { formatPrice } from '../utils/formatters'
+import ProductItem from '../components/ProductItem'
+import type { ApiError } from '../types/ApiError'
 import type { Product } from '../types/Product'
+import { getError } from '../utils'
 
 type State = {
   products: Product[]
@@ -16,7 +17,6 @@ type Action =
   | { type: 'FETCH_SUCCESS'; payload: Product[] }
   | { type: 'FETCH_FAIL'; payload: string }
 
-// 2. The Reducer function
 const initialState: State = {
   products: [],
   loading: true,
@@ -26,7 +26,7 @@ const initialState: State = {
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'FETCH_REQUEST':
-      return { ...state, loading: true }
+      return { ...state, loading: true, error: '' } // Reset error on new request
     case 'FETCH_SUCCESS':
       return { ...state, products: action.payload, loading: false }
     case 'FETCH_FAIL':
@@ -46,12 +46,15 @@ export default function HomePage() {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' })
       try {
-        const result = await axios.get('/api/products')
+        // Explicitly typing the axios response
+        const result = await axios.get<Product[]>('/api/products')
         dispatch({ type: 'FETCH_SUCCESS', payload: result.data })
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : 'An unknown error occurred'
-        dispatch({ type: 'FETCH_FAIL', payload: message })
+        // Utilizing your getError utility for better error extraction
+        dispatch({
+          type: 'FETCH_FAIL',
+          payload: getError(err as ApiError),
+        })
       }
     }
     fetchData()
@@ -61,23 +64,16 @@ export default function HomePage() {
     <Row>
       {loading ? (
         <Col className="text-center mt-5">
-          <Spinner animation="border" />
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
         </Col>
       ) : error ? (
         <Alert variant="danger">{error}</Alert>
       ) : (
         products.map((product) => (
-          <Col key={product.slug} sm={6} md={4} lg={3}>
-            <Link to={`/product/${product.slug}`}>
-              <img
-                src={product.image}
-                alt={product.name}
-                className="product-image"
-              />
-              <h2>{product.name}</h2>
-              <p>{product.description}</p>
-              <p>Price: {formatPrice(product.price)}</p>
-            </Link>
+          <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
+            <ProductItem product={product} />
           </Col>
         ))
       )}
